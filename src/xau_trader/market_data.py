@@ -16,9 +16,11 @@ class MarketSnapshot:
     ask: float
     spread_points: float
     closes: np.ndarray
+    opens: np.ndarray
     highs: np.ndarray
     lows: np.ndarray
     volumes: np.ndarray
+    bar_times_epoch: np.ndarray
     last_bar_time_utc: datetime
 
 
@@ -40,9 +42,11 @@ def load_snapshot(client: Mt5Client, symbol: str, timeframe: str, point: float, 
     tick = client.latest_tick(symbol)
     rates = client.copy_rates(symbol, timeframe_to_mt5_code(timeframe), count=bars)
     closes = np.array([float(r["close"]) for r in rates], dtype=np.float64)
+    opens = np.array([float(r["open"]) for r in rates], dtype=np.float64)
     highs = np.array([float(r["high"]) for r in rates], dtype=np.float64)
     lows = np.array([float(r["low"]) for r in rates], dtype=np.float64)
     volumes = np.array([float(r["tick_volume"]) for r in rates], dtype=np.float64)
+    bar_times_epoch = np.array([int(r["time"]) for r in rates], dtype=np.int64)
     last_bar_time = int(rates[-1]["time"])
     spread_points = (float(tick.ask) - float(tick.bid)) / point
     return MarketSnapshot(
@@ -51,9 +55,10 @@ def load_snapshot(client: Mt5Client, symbol: str, timeframe: str, point: float, 
         ask=float(tick.ask),
         spread_points=float(spread_points),
         closes=closes,
+        opens=opens,
         highs=highs,
         lows=lows,
         volumes=volumes,
+        bar_times_epoch=bar_times_epoch,
         last_bar_time_utc=client.to_utc_timestamp(last_bar_time),
     )
-

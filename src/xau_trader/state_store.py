@@ -19,6 +19,8 @@ class TraderState:
     total_retries: int = 0
     risk_day_utc: str | None = None
     risk_day_start_equity: float | None = None
+    last_processed_bar_time_utc: str | None = None
+    last_signal_bar_time_utc: str | None = None
 
 
 def load_state(path: str) -> TraderState:

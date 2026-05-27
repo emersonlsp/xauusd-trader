@@ -95,6 +95,11 @@ This file always exists in the same schema, even when unsupervised gate is disab
   - `symbol`
   - `risk_per_trade_pct`
   - `one_position_lock`
+- `execution_rules`:
+  - `stop_take` (dynamic SL/TP and R:R)
+  - `execution` (latency/fill policy)
+  - `costs` (fees/slippage/commission/swap)
+  - `symbol_constraints` (lot/tick/contract metadata)
 - `provenance`:
   - source files used to assemble the artifact.
 

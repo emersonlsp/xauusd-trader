@@ -39,6 +39,9 @@ class RuntimeConfig(BaseModel):
     decision_log_path: str = "logs/decisions.jsonl"
     execution_log_path: str = "logs/executions.jsonl"
     report_path: str = "reports/daily_summary.json"
+    heartbeat_seconds: int = 30
+    fallback_stop_loss_points: float = 100.0
+    fallback_risk_reward_ratio: float = 1.2
 
 
 class AccountConfig(BaseModel):

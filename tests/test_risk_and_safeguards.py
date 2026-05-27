@@ -15,6 +15,7 @@ def test_normalize_volume_respects_bounds_and_step() -> None:
         volume_min=0.01,
         volume_step=0.01,
         volume_max=2.0,
+        filling_mode=1,
     )
     assert normalize_volume(0.005, meta) == 0.01
     assert normalize_volume(0.237, meta) == 0.23
@@ -30,6 +31,7 @@ def test_compute_volume_by_risk_positive() -> None:
         volume_min=0.01,
         volume_step=0.01,
         volume_max=100.0,
+        filling_mode=1,
     )
     vol = compute_volume_by_risk(equity=1000.0, risk_pct=0.005, stop_distance_price=1.0, meta=meta)
     assert vol > 0.0
@@ -43,4 +45,3 @@ def test_in_session_true_for_full_day_window() -> None:
     )
     now = datetime.now(tz=UTC)
     assert in_session(cfg, now) is True
-

@@ -12,6 +12,7 @@ def cli() -> None:
     parser.add_argument("--account", required=True, choices=["demo", "live"])
     parser.add_argument("--runtime-config", default="config/runtime.yaml")
     parser.add_argument("--risk-per-trade-pct", type=float, default=None)
+    parser.add_argument("--reset-state", action="store_true")
     args = parser.parse_args()
 
     runtime, account_cfg, creds = load_configs(args.account, runtime_path=args.runtime_config)
@@ -21,11 +22,15 @@ def cli() -> None:
     client = Mt5Client(creds)
     client.connect()
     try:
-        run(runtime=runtime, client=client, risk_override=args.risk_per_trade_pct)
+        run(
+            runtime=runtime,
+            client=client,
+            risk_override=args.risk_per_trade_pct,
+            reset_state=args.reset_state,
+        )
     finally:
         client.shutdown()
 
 
 if __name__ == "__main__":
     cli()
-

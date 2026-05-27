@@ -24,13 +24,15 @@ def compute_volume_by_risk(
     meta: SymbolMeta,
 ) -> float:
     if stop_distance_price <= 0:
-        return meta.volume_min
+        return 0.0
 
     risk_amount = equity * risk_pct
     value_per_price_unit = meta.tick_value / meta.tick_size
     loss_per_lot = stop_distance_price * value_per_price_unit
     if loss_per_lot <= 0:
-        return meta.volume_min
+        return 0.0
     raw_lots = risk_amount / loss_per_lot
+    if raw_lots < meta.volume_min:
+        # Respect risk cap: do not force broker minimum lot if it would exceed allowed risk.
+        return 0.0
     return normalize_volume(raw_lots, meta)
-

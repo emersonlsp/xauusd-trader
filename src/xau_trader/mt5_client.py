@@ -21,6 +21,8 @@ class SymbolMeta:
     volume_min: float
     volume_step: float
     volume_max: float
+    filling_mode: int
+    trade_exemode: int
 
 
 class Mt5Client:
@@ -54,6 +56,8 @@ class Mt5Client:
             volume_min=float(info.volume_min),
             volume_step=float(info.volume_step),
             volume_max=float(info.volume_max),
+            filling_mode=int(info.filling_mode),
+            trade_exemode=int(info.trade_exemode),
         )
 
     def account_info(self) -> Any:

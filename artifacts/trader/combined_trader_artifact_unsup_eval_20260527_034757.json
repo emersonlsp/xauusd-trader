@@ -1,6 +1,6 @@
 {
   "artifact_type": "xauusd_mt5_trader_combined_v1",
-  "generated_at_utc": "2026-05-27T03:27:03.765035+00:00",
+  "generated_at_utc": "2026-05-27T03:47:57.549890+00:00",
   "supervised": {
     "name": "xgb_clean_014",
     "params": {
@@ -273,8 +273,43 @@
     "signal_interval_bars": 1,
     "warmup_bars_min": 120
   },
+  "execution_rules": {
+    "position_lock": {
+      "enabled": true,
+      "max_open_positions": 1
+    },
+    "stop_take": {
+      "dynamic_by_volatility": true,
+      "mode": "atr",
+      "risk_reward_ratio": 1.2,
+      "vol_stop_k": 2.0,
+      "vol_tp_k": 2.4,
+      "vol_lookback_steps": 50,
+      "min_stop_loss_pct": 0.0025,
+      "max_stop_loss_pct": 0.015
+    },
+    "execution": {
+      "entry_latency_steps": 0,
+      "allow_partial_fill": true,
+      "min_fill_ratio": 0.1
+    },
+    "costs": {
+      "fee_bps_per_side": 0.0,
+      "slippage_points": 5.0,
+      "commission_per_lot_per_side": 3.0,
+      "swap_per_lot_per_day": 0.0
+    },
+    "symbol_constraints": {
+      "contract_size": 100.0,
+      "tick_size": 0.01,
+      "tick_value": 1.0,
+      "min_lot": 0.01,
+      "lot_step": 0.01,
+      "max_lot": 100.0
+    }
+  },
   "provenance": {
     "source": "artifacts\\reports\\xgb_global_two_phase_0_9\\global_two_phase_result.json",
-    "unsup_report": "artifacts\\reports\\unsup_champion_eval\\20260527_032658\\unsup_champion_report.json"
+    "unsup_report": "artifacts\\reports\\unsup_champion_eval\\20260527_034751\\unsup_champion_report.json"
   }
 }
