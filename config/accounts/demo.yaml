@@ -1,0 +1,7 @@
+name: demo
+login_env: MT5_LOGIN
+password_env: MT5_PASSWORD
+server_env: MT5_SERVER
+path_env: MT5_PATH
+allow_live: false
+

@@ -1,0 +1,26 @@
+symbol: XAUUSD
+timeframe: M1
+artifact_path: artifacts/trader/combined_trader_artifact.json
+risk_per_trade_pct: 0.005
+max_daily_loss_pct: 0.10
+max_open_positions: 1
+max_spread_points: 80
+slippage_points: 30
+commission_per_lot_per_side: 3.0
+swap_per_lot_per_day: 0.0
+session_hours:
+  start: "00:00"
+  end: "23:59"
+magic_number: 7726001
+dry_run: false
+cooldown_seconds: 20
+poll_interval_seconds: 5
+stale_data_seconds: 120
+max_consecutive_errors: 5
+mt5_retry_attempts: 3
+mt5_retry_delay_seconds: 2
+kill_switch_path: logs/KILL_SWITCH
+state_path: logs/state.json
+decision_log_path: logs/decisions.jsonl
+execution_log_path: logs/executions.jsonl
+report_path: reports/daily_summary.json

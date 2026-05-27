@@ -1,0 +1,240 @@
+{
+  "artifact_type": "xauusd_mt5_trader_combined_v1",
+  "generated_at_utc": "2026-05-27T01:53:59.840683+00:00",
+  "supervised": {
+    "name": "xgb_clean_014",
+    "params": {
+      "search_seed": 2,
+      "horizon_steps": 40,
+      "move_threshold_bps": 0.4,
+      "sample_every_updates": 15,
+      "min_signal_confidence": 0.55,
+      "max_spread_brl": 12.0,
+      "cost_bps_per_side": 0.0,
+      "n_folds": 4,
+      "strategy_kwargs": {
+        "n_estimators": 500,
+        "max_depth": 2,
+        "learning_rate": 0.03,
+        "subsample": 0.9,
+        "colsample_bytree": 0.9,
+        "reg_lambda": 0.25,
+        "min_confidence": 0.6,
+        "n_jobs": 1,
+        "xgb_device": "cuda"
+      },
+      "dataset_key": "h40_m0_4_s15"
+    },
+    "summary": {
+      "mean_accuracy": 0.03374580575228514,
+      "mean_pnl_net_usd": 781.2477954101662,
+      "mean_pnl_net": 781.2477954101662,
+      "total_trades": 2062,
+      "mean_max_drawdown_usd": 147.4055371093732,
+      "mean_max_drawdown_pct": 0.09089062984084609,
+      "mean_expectancy_usd_per_trade": 1.3188293738896428,
+      "mean_final_bankroll_usd": 1781.2477954101844,
+      "mean_return_pct": 0.7812477954101844,
+      "mean_win_rate": 0.5862853878635423,
+      "mean_fill_rate": 1.0,
+      "mean_cancel_rate": 0.0,
+      "mean_slippage_bps": 0.12438080083489471,
+      "risk_per_trade_pct": 0.005,
+      "paper_bankroll": 1000.0,
+      "monthly_goal_threshold_pct": 0.02,
+      "monthly_goal_all_pass": false,
+      "monthly_min_return_pct": -0.031497341974281334,
+      "monthly_compound_mean_return_pct": 0.14623232509606776,
+      "annualized_return_from_monthly_pct": 4.143654898241611,
+      "period_start_ts": "2025-06-16T05:36:00+00:00",
+      "period_end_ts": "2026-05-26T21:18:00+00:00",
+      "period_months": 11.3233401779603,
+      "period_monthly_equiv_return_pct": 0.05230651642884676,
+      "long_horizon_goal_monthly_threshold_pct": 0.02,
+      "long_horizon_goal_pass": true,
+      "max_drawdown_limit_pct": 0.1,
+      "max_drawdown_limit_pass": true,
+      "feature_importance_mean": {
+        "mlofi_l1": 0.011056947987526655,
+        "mlofi_l2": 0.0208105999045074,
+        "mlofi_l3": 0.01786692370660603,
+        "mlofi_l4": 0.03979694191366434,
+        "mlofi_l5": 0.1491416785866022,
+        "mlofi_l6": 0.047951001673936844,
+        "mlofi_l7": 0.0316884396597743,
+        "mlofi_l8": 0.06121649220585823,
+        "mlofi_l9": 0.012846361147239804,
+        "mlofi_l10": 0.029237516224384308,
+        "mlofi_score": 0.013094076421111822,
+        "spread": 0.02290973160415888,
+        "zone_support_dist_atr": 0.0750152487307787,
+        "zone_resist_dist_atr": 0.10700336657464504,
+        "zone_between_sr": 0.19769642502069473,
+        "zone_near_support": 0.0702157448977232,
+        "zone_near_resist": 0.0924525186419487,
+        "zone_break_support": 0.0,
+        "zone_reclaim_support": 0.0,
+        "zone_break_resist": 0.0,
+        "zone_reject_resist": 0.0
+      },
+      "feature_importance_top20": [
+        {
+          "feature": "zone_between_sr",
+          "importance": 0.19769642502069473
+        },
+        {
+          "feature": "mlofi_l5",
+          "importance": 0.1491416785866022
+        },
+        {
+          "feature": "zone_resist_dist_atr",
+          "importance": 0.10700336657464504
+        },
+        {
+          "feature": "zone_near_resist",
+          "importance": 0.0924525186419487
+        },
+        {
+          "feature": "zone_support_dist_atr",
+          "importance": 0.0750152487307787
+        },
+        {
+          "feature": "zone_near_support",
+          "importance": 0.0702157448977232
+        },
+        {
+          "feature": "mlofi_l8",
+          "importance": 0.06121649220585823
+        },
+        {
+          "feature": "mlofi_l6",
+          "importance": 0.047951001673936844
+        },
+        {
+          "feature": "mlofi_l4",
+          "importance": 0.03979694191366434
+        },
+        {
+          "feature": "mlofi_l7",
+          "importance": 0.0316884396597743
+        },
+        {
+          "feature": "mlofi_l10",
+          "importance": 0.029237516224384308
+        },
+        {
+          "feature": "spread",
+          "importance": 0.02290973160415888
+        },
+        {
+          "feature": "mlofi_l2",
+          "importance": 0.0208105999045074
+        },
+        {
+          "feature": "mlofi_l3",
+          "importance": 0.01786692370660603
+        },
+        {
+          "feature": "mlofi_score",
+          "importance": 0.013094076421111822
+        },
+        {
+          "feature": "mlofi_l9",
+          "importance": 0.012846361147239804
+        },
+        {
+          "feature": "mlofi_l1",
+          "importance": 0.011056947987526655
+        },
+        {
+          "feature": "zone_break_support",
+          "importance": 0.0
+        },
+        {
+          "feature": "zone_reclaim_support",
+          "importance": 0.0
+        },
+        {
+          "feature": "zone_break_resist",
+          "importance": 0.0
+        }
+      ],
+      "mean_pnl_net_brl": 781.2477954101662,
+      "mean_max_drawdown_brl": 147.4055371093732,
+      "mean_expectancy_brl_per_trade": 1.3188293738896428,
+      "mean_final_bankroll_brl": 1781.2477954101844
+    },
+    "folds_usd": [
+      {
+        "fold_id": 1,
+        "pnl_net_usd": 144.7753124999998,
+        "trades_usd": 407.0,
+        "max_drawdown_usd": 57.153144531245744,
+        "expectancy_usd_per_trade": 0.3557132985257981
+      },
+      {
+        "fold_id": 2,
+        "pnl_net_usd": 913.8844824218913,
+        "trades_usd": 666.0,
+        "max_drawdown_usd": 126.09439453124787,
+        "expectancy_usd_per_trade": 1.3721989225553923
+      },
+      {
+        "fold_id": 3,
+        "pnl_net_usd": 1806.624570312524,
+        "trades_usd": 776.0,
+        "max_drawdown_usd": 234.84853515624945,
+        "expectancy_usd_per_trade": 2.3281244462790256
+      },
+      {
+        "fold_id": 4,
+        "pnl_net_usd": 259.7068164062497,
+        "trades_usd": 213.0,
+        "max_drawdown_usd": 171.52607421874973,
+        "expectancy_usd_per_trade": 1.2192808281983554
+      }
+    ],
+    "stability": {
+      "positive_folds": 4.0,
+      "positive_ratio": 1.0,
+      "worst_fold_pnl_usd": 144.7753124999998
+    },
+    "gate": {
+      "baseline_ref": "baseline_imbalance_v1",
+      "baseline_pnl_usd": 138.73412109374917,
+      "baseline_positive_ratio": 0.75,
+      "candidate_positive_ratio": 1.0,
+      "pass_pnl_vs_baseline": true,
+      "pass_stability_vs_baseline": true,
+      "pass_long_horizon_goal": true,
+      "pass_max_drawdown_limit": true,
+      "period_monthly_equiv_return_pct": 0.05230651642884676,
+      "mean_max_drawdown_pct": 0.09089062984084609,
+      "period_start_ts": "2025-06-16T05:36:00+00:00",
+      "period_end_ts": "2026-05-26T21:18:00+00:00",
+      "period_months": 11.3233401779603,
+      "promote": true
+    },
+    "score": 784.7374223355326,
+    "proxy_score_gpu": 773.5504830000801,
+    "source_seed": 2
+  },
+  "unsupervised_gate": {
+    "enabled": true,
+    "model": "kmeans",
+    "k": 5,
+    "min_cluster_trades": 40,
+    "allow_score_threshold_bps": 1.0
+  },
+  "runtime_defaults": {
+    "symbol": "XAUUSD",
+    "risk_per_trade_pct": 0.005,
+    "one_position_lock": true
+  },
+  "provenance": {
+    "champion_source": "artifacts\\trader\\_auto_best_from_global.json",
+    "promotion_decision": null,
+    "unsup_grid_result": "artifacts\\reports\\unsup_champion_grid\\20260527_014225\\unsup_grid_result.json",
+    "unsup_eval_report": "artifacts\\reports\\unsup_champion_eval\\20260527_014951\\unsup_champion_report.json"
+  }
+}

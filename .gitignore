@@ -1,0 +1,11 @@
+.env
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc
+
+logs/*.jsonl
+logs/*.json
+logs/KILL_SWITCH
+reports/*.json
+
