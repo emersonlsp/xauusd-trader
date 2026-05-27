@@ -2,12 +2,9 @@
 setlocal
 title XAUUSD Trader - DEMO
 cd /d "%~dp0\.."
-set PYTHON_EXE=%LocalAppData%\Programs\Python\Python312\python.exe
+set PYTHON_EXE=%CD%\.venv\Scripts\python.exe
 if not exist "%PYTHON_EXE%" (
-  echo [ERROR] Python nao encontrado em: %PYTHON_EXE%
-  echo Ajuste o caminho no script ou instale Python 3.12.
-  pause
-  exit /b 1
+  set PYTHON_EXE=python
 )
 
 echo [INFO] Iniciando trader DEMO...
