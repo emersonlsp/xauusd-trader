@@ -27,3 +27,4 @@ report_path: reports/daily_summary.json
 heartbeat_seconds: 30
 fallback_stop_loss_points: 100
 fallback_risk_reward_ratio: 1.2
+invert_signals: true

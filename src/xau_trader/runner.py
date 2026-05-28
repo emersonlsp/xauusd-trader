@@ -353,13 +353,28 @@ def run(runtime: RuntimeConfig, client: Mt5Client, risk_override: float | None =
                 fallback_sl_points=runtime.fallback_stop_loss_points,
                 fallback_rr=runtime.fallback_risk_reward_ratio,
             )
+            if runtime.invert_signals:
+                if signal.action == "long":
+                    signal.action = "short"
+                elif signal.action == "short":
+                    signal.action = "long"
             state.total_signals += 1
             state.last_processed_bar_time_utc = current_bar_iso
+            append_jsonl(
+                runtime.decision_log_path,
+                {
+                    "event": "signal",
+                    "action": signal.action,
+                    "confidence": signal.confidence,
+                    "pred_class": signal.meta.get("pred_class"),
+                    "probs": signal.meta.get("probs"),
+                    "invert_signals": runtime.invert_signals,
+                    "stop_distance_price": float(signal.stop_distance),
+                    "take_profit_distance_price": float(signal.take_profit_distance),
+                },
+            )
             if signal.action == "hold":
-                append_jsonl(
-                    runtime.decision_log_path,
-                    {"event": "signal", "reason_code": rc.SIGNAL_HOLD, "action": "hold", "confidence": signal.confidence},
-                )
+                append_jsonl(runtime.decision_log_path, {"event": "blocked", "reason_code": rc.SIGNAL_HOLD})
                 time.sleep(runtime.poll_interval_seconds)
                 continue
 

@@ -42,6 +42,7 @@ class RuntimeConfig(BaseModel):
     heartbeat_seconds: int = 30
     fallback_stop_loss_points: float = 100.0
     fallback_risk_reward_ratio: float = 1.2
+    invert_signals: bool = False
 
 
 class AccountConfig(BaseModel):
