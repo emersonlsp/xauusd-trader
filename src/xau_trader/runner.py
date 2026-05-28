@@ -233,6 +233,17 @@ def run(runtime: RuntimeConfig, client: Mt5Client, risk_override: float | None =
         symbol_meta.volume_max = float(constraints.get("max_lot", symbol_meta.volume_max))
 
     risk_pct = risk_override if risk_override is not None else runtime.risk_per_trade_pct
+    append_jsonl(
+        runtime.decision_log_path,
+        {
+            "event": "startup",
+            "symbol": runtime.symbol,
+            "timeframe": runtime.timeframe,
+            "artifact_path": runtime.artifact_path,
+            "invert_signals": runtime.invert_signals,
+            "risk_per_trade_pct": risk_pct,
+        },
+    )
     last_heartbeat_ts = 0.0
     while True:
         if kill_switch_engaged(runtime):

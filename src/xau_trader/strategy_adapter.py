@@ -120,6 +120,11 @@ class StrategyAdapter:
         pred_idx = int(np.argmax(p))
         confidence = float(p[pred_idx])
         direction = int(self.target_classes[pred_idx])
+        raw_action = "hold"
+        if direction > 0:
+            raw_action = "long"
+        elif direction < 0:
+            raw_action = "short"
         if confidence < self.min_signal_confidence:
             action = "hold"
         elif direction > 0:
@@ -146,6 +151,12 @@ class StrategyAdapter:
                 "threshold": self.threshold,
                 "min_signal_confidence": self.min_signal_confidence,
                 "probs": [float(v) for v in p.tolist()],
+                "class_prob_map": {
+                    str(self.target_classes[0]): float(p[0]),
+                    str(self.target_classes[1]): float(p[1]),
+                    str(self.target_classes[2]): float(p[2]),
+                },
                 "pred_class": direction,
+                "raw_action": raw_action,
             },
         )
