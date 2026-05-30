@@ -111,8 +111,6 @@ class StrategyAdapter:
             issues.append("missing_inference_features")
         if len(self.target_classes) != 3:
             issues.append("invalid_target_classes")
-        if self.unsup_enabled and self.unsup_mode == "score_fallback":
-            issues.append("unsup_enabled_without_full_payload_using_score_fallback")
         return issues
 
     def runtime_from_artifact(self) -> dict[str, Any]:
