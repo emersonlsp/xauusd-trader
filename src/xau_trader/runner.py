@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import time
 from datetime import UTC, datetime, timedelta
@@ -233,6 +233,7 @@ def run(runtime: RuntimeConfig, client: Mt5Client, risk_override: float | None =
         symbol_meta.volume_max = float(constraints.get("max_lot", symbol_meta.volume_max))
 
     risk_pct = risk_override if risk_override is not None else runtime.risk_per_trade_pct
+    artifact_issues = strategy.validate_artifact_contract()
     append_jsonl(
         runtime.decision_log_path,
         {
@@ -242,6 +243,9 @@ def run(runtime: RuntimeConfig, client: Mt5Client, risk_override: float | None =
             "artifact_path": runtime.artifact_path,
             "invert_signals": runtime.invert_signals,
             "risk_per_trade_pct": risk_pct,
+            "unsup_enabled": bool(strategy.unsup_enabled),
+            "unsup_mode": str(strategy.unsup_mode),
+            "artifact_contract_issues": artifact_issues,
         },
     )
     last_heartbeat_ts = 0.0
@@ -258,7 +262,7 @@ def run(runtime: RuntimeConfig, client: Mt5Client, risk_override: float | None =
                 runtime.symbol,
                 runtime.timeframe,
                 symbol_meta.point,
-                max(800, warmup_bars_min),
+                max(int(runtime.feature_lookback_bars), warmup_bars_min),
             )
             acc = _with_retry(runtime, state, client.account_info)
             now_ts = time.time()
@@ -382,10 +386,13 @@ def run(runtime: RuntimeConfig, client: Mt5Client, risk_override: float | None =
                     "invert_signals": runtime.invert_signals,
                     "stop_distance_price": float(signal.stop_distance),
                     "take_profit_distance_price": float(signal.take_profit_distance),
+                    "unsup_gate": signal.meta.get("unsup_gate"),
                 },
             )
             if signal.action == "hold":
-                append_jsonl(runtime.decision_log_path, {"event": "blocked", "reason_code": rc.SIGNAL_HOLD})
+                gate = signal.meta.get("unsup_gate", {})
+                reason = rc.UNSUP_GATE_BLOCKED if (isinstance(gate, dict) and gate.get("passed") is False) else rc.SIGNAL_HOLD
+                append_jsonl(runtime.decision_log_path, {"event": "blocked", "reason_code": reason, "unsup_gate": gate})
                 time.sleep(runtime.poll_interval_seconds)
                 continue
 
@@ -565,3 +572,6 @@ def run(runtime: RuntimeConfig, client: Mt5Client, risk_override: float | None =
                 append_jsonl(runtime.decision_log_path, {"event": "shutdown", "reason_code": rc.MAX_ERRORS_REACHED})
                 break
             time.sleep(runtime.poll_interval_seconds)
+
+
+

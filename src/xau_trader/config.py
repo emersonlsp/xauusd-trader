@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 from pathlib import Path
@@ -31,6 +31,7 @@ class RuntimeConfig(BaseModel):
     cooldown_seconds: int = 20
     poll_interval_seconds: int = 5
     stale_data_seconds: int = 120
+    feature_lookback_bars: int = 3600
     max_consecutive_errors: int = 5
     mt5_retry_attempts: int = 3
     mt5_retry_delay_seconds: int = 2
@@ -85,3 +86,5 @@ def load_configs(account: str, runtime_path: str = "config/runtime.yaml") -> tup
 
     creds = Mt5Credentials(login=int(login_raw), password=password, server=server, path=path)
     return runtime, account_cfg, creds
+
+

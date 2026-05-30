@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from datetime import UTC, datetime
 from statistics import mean, pstdev
@@ -20,7 +20,7 @@ def _ema(values: list[float], period: int) -> list[float]:
 
 
 def _build_h1_zone_map(rows: list[dict[str, Any]]) -> dict[str, dict[str, float]]:
-    if len(rows) < 600:
+    if len(rows) < 3000:
         return {}
     h1: list[dict[str, Any]] = []
     block = 60
@@ -162,4 +162,5 @@ def build_features(snapshot: MarketSnapshot) -> dict[str, float]:
         "last_price": c,
         "range_14": atr14,
     }
+
 

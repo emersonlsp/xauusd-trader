@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import base64
 import json
@@ -50,10 +50,70 @@ class StrategyAdapter:
         if len(self.target_classes) != 3:
             raise RuntimeError(f"Unexpected target_classes: {self.target_classes}")
 
-        self.threshold = float(
-            self.supervised_params.get("move_threshold_bps", 3.0)
-        ) / 10_000.0
+        self.threshold = float(self.supervised_params.get("move_threshold_bps", 3.0)) / 10_000.0
         self.min_signal_confidence = float(self.supervised_params.get("min_signal_confidence", 0.0))
+
+        # Unsupervised gate runtime contract.
+        self.unsup_enabled = bool(self.unsup.get("enabled", False))
+        self.unsup_allow_score_threshold_bps = float(self.unsup.get("allow_score_threshold_bps", 0.0))
+        self.unsup_feature_order: list[str] = list(self.unsup.get("feature_order", self.feature_order))
+        self.unsup_mode = "disabled"
+        self.unsup_centroids: np.ndarray | None = None
+        self.unsup_scaler_mean: np.ndarray | None = None
+        self.unsup_scaler_scale: np.ndarray | None = None
+        self.unsup_allowed_clusters: set[int] = set()
+        self.unsup_cluster_scores_bps: dict[int, float] = {}
+        if self.unsup_enabled:
+            self._init_unsup_gate()
+
+    def _init_unsup_gate(self) -> None:
+        scaler = self.unsup.get("scaler", {}) or {}
+        kmeans = self.unsup.get("kmeans", {}) or {}
+        means = scaler.get("mean") or self.unsup.get("scaler_mean")
+        scales = scaler.get("scale") or self.unsup.get("scaler_scale")
+        centers = (
+            kmeans.get("centroids")
+            or kmeans.get("centers")
+            or self.unsup.get("kmeans_centroids")
+            or self.unsup.get("cluster_centers")
+        )
+        allowed = self.unsup.get("allowed_clusters") or self.unsup.get("allowed_cluster_ids") or []
+        cluster_scores = self.unsup.get("cluster_scores_bps") or self.unsup.get("cluster_mean_ret_bps") or {}
+
+        full_payload_ok = means is not None and scales is not None and centers is not None and len(allowed) > 0
+        if full_payload_ok:
+            mean_np = np.asarray(means, dtype=np.float32)
+            scale_np = np.asarray(scales, dtype=np.float32)
+            cent_np = np.asarray(centers, dtype=np.float32)
+            if mean_np.ndim != 1 or scale_np.ndim != 1 or cent_np.ndim != 2:
+                raise RuntimeError("Invalid unsupervised_gate payload shape (scaler/kmeans).")
+            n_feat = len(self.unsup_feature_order)
+            if len(mean_np) != n_feat or len(scale_np) != n_feat or int(cent_np.shape[1]) != n_feat:
+                raise RuntimeError(
+                    "unsupervised_gate feature dimension mismatch with feature_order. "
+                    f"expected={n_feat} mean={len(mean_np)} scale={len(scale_np)} centers={int(cent_np.shape[1])}"
+                )
+            self.unsup_scaler_mean = mean_np
+            self.unsup_scaler_scale = np.where(np.abs(scale_np) < 1.0e-12, 1.0, scale_np)
+            self.unsup_centroids = cent_np
+            self.unsup_allowed_clusters = {int(x) for x in allowed}
+            if isinstance(cluster_scores, dict):
+                self.unsup_cluster_scores_bps = {int(k): float(v) for k, v in cluster_scores.items()}
+            self.unsup_mode = "full"
+            return
+
+        # Fallback for older artifacts: keep only score gate to avoid silent no-gate.
+        self.unsup_mode = "score_fallback"
+
+    def validate_artifact_contract(self) -> list[str]:
+        issues: list[str] = []
+        if not self.feature_order:
+            issues.append("missing_inference_features")
+        if len(self.target_classes) != 3:
+            issues.append("invalid_target_classes")
+        if self.unsup_enabled and self.unsup_mode == "score_fallback":
+            issues.append("unsup_enabled_without_full_payload_using_score_fallback")
+        return issues
 
     def runtime_from_artifact(self) -> dict[str, Any]:
         return {
@@ -66,7 +126,13 @@ class StrategyAdapter:
             "swap_per_lot_per_day": self.cost_rules.get("swap_per_lot_per_day"),
         }
 
-    def _resolve_stop_take_distances(self, features: dict[str, float], point: float, fallback_sl_points: float, fallback_rr: float) -> tuple[float, float]:
+    def _resolve_stop_take_distances(
+        self,
+        features: dict[str, float],
+        point: float,
+        fallback_sl_points: float,
+        fallback_rr: float,
+    ) -> tuple[float, float]:
         current_price = float(features["last_price"])
         vol = float(features["range_14"])
         rules = self.stop_take_rules or {}
@@ -107,6 +173,39 @@ class StrategyAdapter:
         take_profit_distance = max(stop_distance * rr, tp_distance)
         return stop_distance, take_profit_distance
 
+    def _unsup_pass(self, features: dict[str, float], score_bps: float) -> tuple[bool, dict[str, Any]]:
+        if not self.unsup_enabled:
+            return True, {"mode": "disabled"}
+
+        if self.unsup_mode == "full":
+            x = np.asarray([float(features.get(k, 0.0)) for k in self.unsup_feature_order], dtype=np.float32)
+            xz = (x - self.unsup_scaler_mean) / self.unsup_scaler_scale  # type: ignore[operator]
+            d2 = np.sum((self.unsup_centroids - xz[None, :]) ** 2, axis=1)  # type: ignore[operator]
+            cluster_id = int(np.argmin(d2))
+            allowed = cluster_id in self.unsup_allowed_clusters
+            if not allowed:
+                return False, {
+                    "mode": "full",
+                    "cluster_id": cluster_id,
+                    "allowed_clusters": sorted(self.unsup_allowed_clusters),
+                    "cluster_score_bps": float(self.unsup_cluster_scores_bps.get(cluster_id, 0.0)),
+                }
+            return True, {
+                "mode": "full",
+                "cluster_id": cluster_id,
+                "allowed_clusters": sorted(self.unsup_allowed_clusters),
+                "cluster_score_bps": float(self.unsup_cluster_scores_bps.get(cluster_id, 0.0)),
+            }
+
+        # score_fallback mode for backward compatibility artifacts.
+        # Accept only if signed score (long-positive / short-negative) exceeds configured bps threshold.
+        pass_score = float(score_bps) >= float(self.unsup_allow_score_threshold_bps)
+        return pass_score, {
+            "mode": "score_fallback",
+            "score_bps": float(score_bps),
+            "allow_score_threshold_bps": float(self.unsup_allow_score_threshold_bps),
+        }
+
     def predict(
         self,
         features: dict[str, float],
@@ -125,6 +224,7 @@ class StrategyAdapter:
             raw_action = "long"
         elif direction < 0:
             raw_action = "short"
+
         if confidence < self.min_signal_confidence:
             action = "hold"
         elif direction > 0:
@@ -134,6 +234,14 @@ class StrategyAdapter:
         else:
             action = "hold"
         score = float(p[2] - p[0]) if len(p) == 3 else 0.0
+
+        unsup_meta: dict[str, Any] = {"mode": "disabled", "passed": True}
+        if action != "hold":
+            signed_score_bps = float(score * 10000.0) if direction >= 0 else float(-score * 10000.0)
+            gate_ok, gate_info = self._unsup_pass(features, signed_score_bps)
+            unsup_meta = {"passed": bool(gate_ok), **gate_info}
+            if not gate_ok:
+                action = "hold"
 
         stop_distance, take_profit_distance = self._resolve_stop_take_distances(
             features=features,
@@ -158,5 +266,6 @@ class StrategyAdapter:
                 },
                 "pred_class": direction,
                 "raw_action": raw_action,
+                "unsup_gate": unsup_meta,
             },
         )
