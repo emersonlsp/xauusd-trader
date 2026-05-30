@@ -1,6 +1,6 @@
 ﻿symbol: XAUUSD
 timeframe: M1
-artifact_path: artifacts/trader/combined_trader_artifact_unsup_eval_20260527_034757.json
+artifact_path: artifacts/trader/combined_trader_artifact_unsup_eval_20260530_232135.json
 risk_per_trade_pct: 0.01
 max_daily_loss_pct: 0.10
 max_open_positions: 1
@@ -28,4 +28,5 @@ heartbeat_seconds: 30
 fallback_stop_loss_points: 100
 fallback_risk_reward_ratio: 1.2
 invert_signals: false
+
 
